@@ -1,7 +1,7 @@
 /* ============================================================
    HEXAWEB STUDIO — script.js
-   Vanilla JS: theming, navigation, animations, portfolio,
-   testimonials, FAQ, form validation. No dependencies.
+   Global site behaviour only: theming, navigation, animations,
+   FAQ, form validation. Portfolio logic lives in portfolio.js.
    ============================================================ */
 'use strict';
 
@@ -55,8 +55,8 @@
       burger.classList.toggle('open', open);
       burger.setAttribute('aria-expanded', String(open));
       burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-      if (header) header.classList.toggle('menu-open', open);   // keep header readable on top
-      document.body.style.overflow = open ? 'hidden' : '';      // lock scroll while open
+      if (header) header.classList.toggle('menu-open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
     };
     burger.addEventListener('click', () => setMenu(!mobileMenu.classList.contains('open')));
     $$('a', mobileMenu).forEach(a => a.addEventListener('click', () => setMenu(false)));
@@ -112,6 +112,7 @@
       revealEls.forEach(el => io.observe(el));
     }
   }
+
   // Eyebrows outside data-reveal (sticky columns etc.)
   $$('[data-scramble]:not([data-reveal])').forEach(el => {
     const io = new IntersectionObserver(entries => {
@@ -231,119 +232,6 @@
       if (!ticking) { requestAnimationFrame(update); ticking = true; }
     }, { passive: true });
     update();
-  }
-
-  /* ---------- Portfolio: data, filter, modal ---------- */
-  const PROJECTS = {
-    arunika: { title:'Arunika Coffee Roasters', cat:'E-Commerce', year:'2024', client:'Concept build', seed:'arunika-coffee',
-      desc:'A complete storefront concept for a specialty roastery — product catalog, subscriptions, and a streamlined two-step checkout, built end-to-end as a working demo of how we\'d launch a real store.',
-      deliver:['Brand-led store design','Product catalog & subscriptions','Payment gateway integration','Order & inventory dashboard','Hosting, domain & SSL setup','Maintenance plan structure'],
-      tech:['HTML/CSS/JS','Node.js','PostgreSQL','Midtrans','Cloudflare'] },
-    legalax: { title:'Legalax Partners', cat:'Company Profile', year:'2023', client:'Concept build', seed:'legalax-lawfirm',
-      desc:'A corporate profile concept for a fictional law firm — bilingual structure, practice-area pages, and a lightweight CMS so a real firm could edit everything without touching code.',
-      deliver:['Bilingual ID/EN structure','Practice-area CMS','Team & case study pages','Structured data & SEO','Managed hosting & email setup'],
-      tech:['HTML/CSS/JS','Headless CMS','Cloudflare','Google Analytics'] },
-    terranest: { title:'TerraNest Realty', cat:'Business Website', year:'2024', client:'Personal project', seed:'terranest-realty',
-      desc:'A property-listings concept with map filters and a lead pipeline wired into a CRM — our way of practicing fast, data-heavy pages that still feel effortless.',
-      deliver:['Listings with map filters','Lead capture → CRM pipeline','Agent profile pages','WhatsApp enquiry buttons','Deployment & monitoring'],
-      tech:['HTML/CSS/JS','Laravel','Maps API','MySQL'] },
-    medicare: { title:'MediCare+ Clinic OS', cat:'Web Application', year:'2024', client:'Concept build', seed:'medicare-clinic',
-      desc:'An appointment-booking system concept with a patient portal, doctor dashboards, and reminder flows — built to understand real clinic workflows from the inside.',
-      deliver:['Patient booking portal','Doctor & admin dashboards','Reminder engine design','Role-based access control','Load-tested deployment'],
-      tech:['Node.js','PostgreSQL','WhatsApp API','Docker'] },
-    voltra: { title:'Voltra Launch', cat:'Landing Page', year:'2025', client:'Experiment', seed:'voltra-saas',
-      desc:'A SaaS waitlist landing page we use as our A/B testing playground — two variants, careful analytics wiring, and sub-second loads on purpose.',
-      deliver:['Conversion-focused design','A/B test variants','Waitlist backend','Analytics & event tracking','Edge deployment'],
-      tech:['HTML/CSS/JS','Node.js','A/B testing','Plausible'] },
-    kirana: { title:'Kirana Visuals', cat:'Portfolio', year:'2023', client:'Personal project', seed:'kirana-photography',
-      desc:'A photography portfolio with password-protected client galleries and a CDN image pipeline — built around a photographer friend\'s real workflow.',
-      deliver:['Gallery-first design','Private client galleries','CDN image pipeline','Booking enquiry flow'],
-      tech:['HTML/CSS/JS','CDN','Lightbox','SEO'] },
-    logistik: { title:'LogistikPro Dashboard', cat:'Web Application', year:'2023', client:'Experiment', seed:'logistik-fleet',
-      desc:'A real-time fleet dashboard concept with live maps, delivery reporting, and alerts — our stress test for live-data interfaces.',
-      deliver:['Real-time fleet map','Delivery & SLA reporting','Alerting rules engine','Driver mobile views','24/7 monitoring setup'],
-      tech:['Node.js','WebSockets','PostgreSQL','Redis'] },
-    lumbung: { title:'Lumbung Batik', cat:'E-Commerce', year:'2022', client:'Concept build', seed:'lumbung-batik',
-      desc:'A multi-vendor marketplace concept for batik artisans — vendor onboarding and split payouts, built to learn e-commerce at real depth.',
-      deliver:['Multi-vendor marketplace','Split payment payouts','Vendor onboarding portal','Story-driven product pages','Maintenance plan structure'],
-      tech:['Laravel','Stripe','MySQL','Hand-written CSS'] },
-    summit: { title:'Summit Accounting', cat:'Business Website', year:'2022', client:'Concept build', seed:'summit-accounting',
-      desc:'A corporate site concept with a secure client document portal — simple on the surface, carefully engineered underneath.',
-      deliver:['Corporate identity site','Secure client portal','Encrypted file uploads','SSO login','Hosting & SLA structure'],
-      tech:['HTML/CSS/JS','Node.js','SSO','PostgreSQL'] }
-  };
-
-  const grid = $('#portfolioGrid');
-  if (grid) {
-    // Filter
-    const items = $$('.project-item', grid);
-    const countEl = $('#filterCount');
-    $$('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        $$('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const f = btn.dataset.filter;
-        let shown = 0;
-        items.forEach(it => {
-          const match = f === 'all' || it.dataset.cat === f;
-          if (match) {
-            shown++;
-            it.classList.remove('is-hidden');
-            requestAnimationFrame(() => requestAnimationFrame(() => it.classList.remove('is-out')));
-          } else {
-            it.classList.add('is-out');
-            setTimeout(() => it.classList.add('is-hidden'), 260);
-          }
-        });
-        if (countEl) countEl.textContent = 'Showing ' + shown + ' project' + (shown === 1 ? '' : 's');
-      });
-    });
-
-    // Modal
-    const modal = $('#projectModal');
-    if (modal) {
-      const mImage = $('#mImage'), mTitle = $('#mTitle'), mCat = $('#mCat'),
-            mClient = $('#mClient'), mYear = $('#mYear'), mDesc = $('#mDesc'),
-            mDeliver = $('#mDeliver'), mTech = $('#mTech'), mClose = $('#modalClose');
-      let lastFocus = null;
-
-      const openModal = id => {
-        const p = PROJECTS[id];
-        if (!p) return;
-        mImage.src = 'https://picsum.photos/seed/' + p.seed + '/1200/750';
-        mImage.alt = p.title + ' project preview';
-        mTitle.textContent = p.title;
-        mCat.textContent = p.cat;
-        mClient.textContent = p.client;
-        mYear.textContent = p.year;
-        mDesc.textContent = p.desc;
-        mDeliver.innerHTML = p.deliver.map(d =>
-          '<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' + d + '</li>').join('');
-        mTech.innerHTML = p.tech.map(t => '<span>' + t + '</span>').join('');
-        lastFocus = document.activeElement;
-        modal.classList.add('open');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        mClose.focus();
-      };
-      const closeModal = () => {
-        modal.classList.remove('open');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        if (lastFocus) lastFocus.focus();
-      };
-      items.forEach(it => {
-        it.addEventListener('click', () => openModal(it.dataset.id));
-        it.addEventListener('keydown', e => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(it.dataset.id); }
-        });
-      });
-      mClose.addEventListener('click', closeModal);
-      $('.modal-backdrop', modal).addEventListener('click', closeModal);
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
-      });
-    }
   }
 
   /* ---------- FAQ accordion ---------- */
