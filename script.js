@@ -1,5 +1,5 @@
 /* ============================================================
-   HEXAWEB STUDIO — script.js
+   MAIA Tech Solution — script.js
    Global site behaviour only: theming, navigation, animations,
    FAQ, form validation. Portfolio logic lives in portfolio.js.
    ============================================================ */
@@ -16,12 +16,23 @@
 
   /* ---------- Theme toggle (persisted) ---------- */
   const themeBtn = $('#themeToggle');
+  const brandLogos = $$('.brand-logo');
+  const setBrandLogo = theme => {
+    const src = theme === 'dark'
+      ? 'asset/logo/dark-theme-logo.png'
+      : 'asset/logo/light-theme-logo.png';
+    brandLogos.forEach(img => { img.src = src; });
+  };
+
+  setBrandLogo(document.documentElement.getAttribute('data-theme') || 'light');
+
   if (themeBtn) {
     themeBtn.addEventListener('click', () => {
       const root = document.documentElement;
       const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
       root.setAttribute('data-theme', next);
-      try { localStorage.setItem('hexaweb-theme', next); } catch (e) {}
+      try { localStorage.setItem('maia-theme', next); } catch (e) {}
+      setBrandLogo(next);
     });
   }
 

@@ -1,5 +1,5 @@
 /* ============================================================
-   HEXAWEB STUDIO — portfolio.js
+   MAIA Tech Solution — portfolio.js
    EVERYTHING portfolio lives here: project data (multiple images
    per project), card rendering, filter buttons, count, and the
    case-study modal with an INFINITE image slider.
