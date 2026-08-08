@@ -877,8 +877,8 @@ html[data-theme="dark"] .channel-card.wa .channel-cta{color:#4ade80}
   .form-card{padding:1.6rem}
 
   /* Logo mobile */
-  .brand-logo{height:30px}
-  .site-footer .brand-logo{height:26px}
+  .brand-logo{height:60px}
+  .site-footer .brand-logo{height:66px}
 }
 
 /* ---------- 23. Reduced motion ---------- */
